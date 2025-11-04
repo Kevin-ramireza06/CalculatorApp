@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     Switch switchColor;
 
     private String resultado= "";
-    private String resultadoCopia= "";
     private boolean calculado= false;
 
     @Override
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         pantalla = findViewById(id.pantalla);
         pantallaError = findViewById(id.pantallaError);
         switchColor = findViewById(id.Estilos);
-        Button boton0 = findViewById(id.boton0);
+        /*Button boton0 = findViewById(id.boton0);
         Button boton1 = findViewById(id.boton1);
         Button boton2 = findViewById(id.boton2);
         Button boton3 = findViewById(id.boton3);
@@ -90,21 +89,18 @@ public class MainActivity extends AppCompatActivity {
         Button botonDivicion = findViewById(id.botonDivicion);
         Button botonPor = findViewById(id.botonPor);
         Button botonMenos = findViewById(id.botonMenos);
-        Button botonMas = findViewById(id.botonMas);
+        Button botonMas = findViewById(id.botonMas);*/
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        // guardamos variables importantes
         outState.putString("resultado", resultado);
         outState.putBoolean("calculado", calculado);
 
-        // guardamos contenido de la pantalla
         outState.putString("pantalla", pantalla.getText().toString());
 
-        // guardamos datos de la calculadora
         outState.putString("firstOperand", _calculator.getFirstOperand());
         outState.putString("secondOperand", _calculator.getSecondOperand());
         outState.putSerializable("operator", _calculator.getOperator());
@@ -140,7 +136,12 @@ public class MainActivity extends AppCompatActivity {
         String operador=((Button)view).getText().toString();
 
         if (!_calculator.isNewOperation()) {
+            double res = _calculator.calculate();
+            resultado = String.valueOf(res);
+            pantalla.setText(resultado);
 
+            _calculator.clear();
+            _calculator.setOperand(resultado);
         }
 
         _calculator.setOperator(operator);
@@ -191,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                 _calculator.setOperand(resultado); // para usar el resultado como primer operando si sigues
             } catch (Calculator.DivisionByZeroException e) {
                 pantalla.setText("0.0");
-                pantallaError.setText("ERROR");
+                pantallaError.setText("ERROR: No se puede dividir entre 0");
                 resultado = "";
                 _calculator.clear();
             } catch (Calculator.MissingOperandException e){

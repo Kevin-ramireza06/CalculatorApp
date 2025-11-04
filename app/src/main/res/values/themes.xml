@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.CalculatorApp" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Esta linea es la qu permite que se puedan agregar drawables personalizados -->
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
 
