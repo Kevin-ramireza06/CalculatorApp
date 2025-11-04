@@ -7,6 +7,22 @@ public class Calculator {
     private String secondOperand="";
     private Calculator.Operators operator= null;
 
+    public String getFirstOperand() {
+        return firstOperand;
+    }
+
+    public void setNewOperation(boolean newOperation) {
+        this.newOperation = newOperation;
+    }
+
+    public String getSecondOperand() {
+        return secondOperand;
+    }
+
+    public Operators getOperator() {
+        return operator;
+    }
+
     public void setOperand(String number) {
         if(newOperation){
             firstOperand+= number;

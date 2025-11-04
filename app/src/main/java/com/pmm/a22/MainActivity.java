@@ -2,14 +2,20 @@ package com.pmm.a22;
 
 import static com.pmm.a22.R.*;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
+import androidx.core.view.ContentInfoCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -19,7 +25,12 @@ public class MainActivity extends AppCompatActivity {
 
     private final Calculator _calculator= new Calculator();
 
+    TextView pantalla;
+    TextView pantallaError;
+    Switch switchColor;
+
     private String resultado= "";
+    private String resultadoCopia= "";
     private boolean calculado= false;
 
     @Override
@@ -32,8 +43,40 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        setContentView(R.layout.activity_calculator);
 
-        TextView pantalla = findViewById(id.pantalla);
+        pantalla = findViewById(R.id.pantalla);
+        switchColor = findViewById(id.Estilos);
+
+        if (savedInstanceState != null) {
+            resultado = savedInstanceState.getString("resultado");
+            calculado = savedInstanceState.getBoolean("calculado", false);
+
+            pantalla.setText(savedInstanceState.getString("pantalla"));
+
+            _calculator.setOperand(savedInstanceState.getString("firstOperand"));
+
+            _calculator.setNewOperation(savedInstanceState.getBoolean("newOperation", false));
+
+            _calculator.setOperand(savedInstanceState.getString("secondOperand"));
+            _calculator.setOperator((Calculator.Operators) savedInstanceState.getSerializable("operator"));
+        }
+
+        switchColor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
+                View main = findViewById(id.main);
+                if (isChecked) {
+                    main.setBackgroundColor(Color.DKGRAY);
+                } else {
+                    main.setBackgroundColor(Color.GRAY);
+                }
+            }
+        });
+
+        pantalla = findViewById(id.pantalla);
+        pantallaError = findViewById(id.pantallaError);
+        switchColor = findViewById(id.Estilos);
         Button boton0 = findViewById(id.boton0);
         Button boton1 = findViewById(id.boton1);
         Button boton2 = findViewById(id.boton2);
@@ -50,10 +93,28 @@ public class MainActivity extends AppCompatActivity {
         Button botonMas = findViewById(id.botonMas);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+        // guardamos variables importantes
+        outState.putString("resultado", resultado);
+        outState.putBoolean("calculado", calculado);
+
+        // guardamos contenido de la pantalla
+        outState.putString("pantalla", pantalla.getText().toString());
+
+        // guardamos datos de la calculadora
+        outState.putString("firstOperand", _calculator.getFirstOperand());
+        outState.putString("secondOperand", _calculator.getSecondOperand());
+        outState.putSerializable("operator", _calculator.getOperator());
+        outState.putBoolean("newOperation", _calculator.isNewOperation());
+    }
     public void operandClick(View view) {
 
-        TextView pantalla = findViewById(R.id.pantalla);
+        pantalla = findViewById(R.id.pantalla);
+        pantallaError = findViewById(id.pantallaError);
+        pantallaError.setText("");
 
         if (calculado) clearClick(null);
 
@@ -62,61 +123,81 @@ public class MainActivity extends AppCompatActivity {
 
         String numero=((Button)view).getText().toString();
 
-        // COMPLETAR COMO PARTE DEL EJERCICIO SELECCIONANDO EL OPERANDO
-
         resultado+= numero;
 
         _calculator.setOperand(numero);
-
-        // COMPLETAR COMO PARTE DEL EJERCICIO ACTUALIZANDO LA PANTALLA DE LA CALCULADORA
 
         pantalla.setText(resultado);
     }
 
     public void operatorClick(View view) {
 
-        TextView pantalla = findViewById(R.id.pantalla);
+        pantalla = findViewById(R.id.pantalla);
+        pantallaError = findViewById(id.pantallaError);
+        pantallaError.setText("");
 
-        int operatorButtonId= view.getId();
-        System.out.println(operatorButtonId);
         Calculator.Operators operator= null;
         String operador=((Button)view).getText().toString();
 
         if (!_calculator.isNewOperation()) {
 
-            // COMPLETAR COMO PARTE DEL EJERCICIO EJECUTANDO EL CÁLCULO
-
-            return;
         }
-
-        // COMPLETAR COMO PARTE DEL EJERCICIO SELECCIONANDO EL OPERADOR
 
         _calculator.setOperator(operator);
         resultado+= operador;
 
-        // COMPLETAR COMO PARTE DEL EJERCICIO ACTUALIZANDO LA PANTALLA DE LA CALCULADORA
+        switch(operador){
+            case "+":
+                _calculator.setOperator(Calculator.Operators.ADD);
+                break;
+            case "-":
+                _calculator.setOperator(Calculator.Operators.SUBSTRACT);
+                break;
+            case "*":
+                _calculator.setOperator(Calculator.Operators.MULTIPLY);
+                break;
+            case "/":
+                _calculator.setOperator(Calculator.Operators.DIVIDE);
+                break;
+        }
 
         pantalla.setText(resultado);
-
-        switch(operador){
-            case "+": _calculator.setOperator(Calculator.Operators.ADD); break;
-            case "-": _calculator.setOperator(Calculator.Operators.SUBSTRACT); break;
-            case "*": _calculator.setOperator(Calculator.Operators.MULTIPLY); break;
-            case "/": _calculator.setOperator(Calculator.Operators.DIVIDE); break;
-        }
     }
 
     public void clearClick(View view) {
 
-        TextView pantalla = findViewById(R.id.pantalla);
+        pantalla = findViewById(R.id.pantalla);
 
         _calculator.clear();
         calculado= false;
         resultado= "";
 
-        // COMPLETAR COMO PARTE DEL EJERCICIO ACTUALIZANDO LA PANTALLA DE LA CALCULADORA
-
         pantalla.setText("");
     }
 
+    public void igualClick(View view) {
+        pantalla = findViewById(R.id.pantalla);
+        pantallaError = findViewById(id.pantallaError);
+
+        if (resultado.isEmpty()){
+            pantallaError.setText("La calculadora estra vacia");
+        } else {
+            try {
+                double res = _calculator.calculate();
+                pantalla.setText(String.valueOf(res));
+                resultado = String.valueOf(res);
+                calculado = true;
+                _calculator.clear();
+                _calculator.setOperand(resultado); // para usar el resultado como primer operando si sigues
+            } catch (Calculator.DivisionByZeroException e) {
+                pantalla.setText("0.0");
+                pantallaError.setText("ERROR");
+                resultado = "";
+                _calculator.clear();
+            } catch (Calculator.MissingOperandException e){
+                pantallaError.setText("Falta un Operando");
+            }
+        }
+
+    }
 }
