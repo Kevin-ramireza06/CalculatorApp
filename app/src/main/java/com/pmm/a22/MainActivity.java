@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         pantalla = findViewById(id.pantalla);
         pantallaError = findViewById(id.pantallaError);
         switchColor = findViewById(id.Estilos);
-        /*Button boton0 = findViewById(id.boton0);
+        Button boton0 = findViewById(id.boton0);
         Button boton1 = findViewById(id.boton1);
         Button boton2 = findViewById(id.boton2);
         Button boton3 = findViewById(id.boton3);
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         Button botonDivicion = findViewById(id.botonDivicion);
         Button botonPor = findViewById(id.botonPor);
         Button botonMenos = findViewById(id.botonMenos);
-        Button botonMas = findViewById(id.botonMas);*/
+        Button botonMas = findViewById(id.botonMas);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         calculado= false;
         resultado= "";
 
-        pantalla.setText("");
+        pantalla.setText("0.0");
     }
 
     public void igualClick(View view) {
